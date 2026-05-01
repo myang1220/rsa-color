@@ -1,0 +1,1221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="light" />
+  <title>Color keys</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,600;0,9..40,700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #e9eef6;
+      --surface: #ffffff;
+      --surface2: #f0f3fa;
+      --border: #c9d2e3;
+      --text: #1a2233;
+      --muted: #556070;
+      --accent-alice: #1565c8;
+      --accent-bob: #d84315;
+      --accent-public: #5d6e2f;
+      --radius: 14px;
+      --shadow: 0 4px 28px rgba(26, 34, 51, 0.09);
+    }
+
+    html {
+      color-scheme: light;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "DM Sans", system-ui, sans-serif;
+      background:
+        radial-gradient(1200px 600px at 10% -10%, rgba(21, 101, 200, 0.09), transparent),
+        radial-gradient(900px 500px at 90% 110%, rgba(216, 67, 21, 0.07), transparent),
+        var(--bg);
+      color: var(--text);
+      line-height: 1.45;
+    }
+
+    .shell {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 1.5rem 1rem 2rem;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 1.25rem;
+    }
+
+    header h1 {
+      margin: 0 0 0.4rem;
+      font-size: clamp(1.25rem, 4vw, 1.65rem);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    header p {
+      margin: 0 auto;
+      max-width: 42ch;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .workspace {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      margin-bottom: 1rem;
+      margin-top: 0.25rem;
+    }
+
+    .split-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      align-items: stretch;
+    }
+
+    @media (max-width: 720px) {
+      .split-row {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .pane {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1rem 1.1rem;
+      box-shadow: var(--shadow);
+      transition:
+        opacity 0.2s ease,
+        filter 0.2s ease,
+        box-shadow 0.2s ease;
+    }
+
+    .pane-public {
+      opacity: 1;
+      filter: none;
+      pointer-events: auto;
+      user-select: auto;
+      border-top: 3px solid var(--accent-public);
+    }
+
+    .pane-alice:not(.is-active),
+    .pane-bob:not(.is-active) {
+      opacity: 0.46;
+      filter: grayscale(0.35);
+      pointer-events: none;
+      user-select: none;
+    }
+
+    .pane-alice.is-active,
+    .pane-bob.is-active {
+      filter: none;
+      opacity: 1;
+      pointer-events: auto;
+      user-select: auto;
+    }
+
+    .pane-public.is-active {
+      box-shadow: var(--shadow), 0 0 0 3px rgba(93, 110, 47, 0.35);
+    }
+
+    .pane-alice.is-active {
+      box-shadow: var(--shadow), 0 0 0 3px rgba(21, 101, 200, 0.35);
+    }
+
+    .pane-bob.is-active {
+      box-shadow: var(--shadow), 0 0 0 3px rgba(216, 67, 21, 0.35);
+    }
+
+    .pane-title {
+      margin: 0 0 0.35rem;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+    }
+
+    .pane-public .pane-title {
+      color: var(--accent-public);
+    }
+
+    .pane-alice .pane-title {
+      color: var(--accent-alice);
+    }
+
+    .pane-bob .pane-title {
+      color: var(--accent-bob);
+    }
+
+    .pane-body {
+      min-height: 200px;
+    }
+
+    .pane-hint {
+      margin: 0 0 0.75rem;
+      font-size: 0.86rem;
+      color: var(--muted);
+      line-height: 1.35;
+    }
+
+    .summary-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      align-items: flex-end;
+    }
+
+    .blob.sm {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+    }
+
+    .public-strip {
+      margin-top: 0.65rem;
+    }
+
+    .public-strip h2 {
+      margin: 0 0 0.65rem;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--accent-public);
+    }
+
+    .strip-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.65rem;
+      align-items: end;
+    }
+
+    @media (max-width: 520px) {
+      .strip-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .strip-item span {
+      display: block;
+      font-size: 0.72rem;
+      color: var(--muted);
+      margin-bottom: 0.3rem;
+    }
+
+    .slot {
+      height: 52px;
+      border-radius: 12px;
+      border: 2px dashed #aeb8cc;
+      background: var(--surface2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.72rem;
+      color: var(--muted);
+    }
+
+    .slot.filled {
+      border-style: solid;
+      border-color: rgba(26, 34, 51, 0.18);
+    }
+
+    .slot .hex {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.68rem;
+      color: #fff;
+      text-shadow: 0 0 2px #000, 0 1px 3px rgba(0, 0, 0, 0.55);
+    }
+
+    .slot .hex {
+      border-top: 3px solid var(--accent-alice);
+    }
+
+    .pane-bob {
+      border-top: 3px solid var(--accent-bob);
+    }
+
+    .editor-label {
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.35rem;
+    }
+
+    .color-editor {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 0.75rem;
+    }
+
+    .wheel-row {
+      display: flex;
+      gap: 0.75rem;
+      align-items: flex-start;
+      flex-wrap: wrap;
+    }
+
+    .wheel-host {
+      position: relative;
+      width: 132px;
+      height: 132px;
+      flex-shrink: 0;
+      border-radius: 50%;
+      cursor: crosshair;
+      box-shadow: inset 0 0 0 2px rgba(0, 0, 0, 0.08);
+      touch-action: none;
+    }
+
+    .wheel-host::after {
+      content: "";
+      position: absolute;
+      inset: 22%;
+      border-radius: 50%;
+      background: radial-gradient(circle, #fff 0%, transparent 70%);
+      pointer-events: none;
+      opacity: 0.35;
+    }
+
+    .wheel-knob {
+      position: absolute;
+      width: 16px;
+      height: 16px;
+      margin: -8px 0 0 -8px;
+      border-radius: 50%;
+      border: 2px solid #fff;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .controls-stack {
+      flex: 1;
+      min-width: 140px;
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+    }
+
+    input[type="color"] {
+      width: 100%;
+      height: 38px;
+      padding: 2px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--surface);
+      cursor: pointer;
+    }
+
+    .slider-row {
+      display: grid;
+      grid-template-columns: 14px 1fr 36px;
+      align-items: center;
+      gap: 0.4rem;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.7rem;
+      color: var(--muted);
+    }
+
+    .slider-row span:first-child {
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--accent-alice);
+    }
+
+    .hex-row {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-top: 0.15rem;
+    }
+
+    .mix-layout {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.65rem;
+      margin-bottom: 1rem;
+    }
+
+    .shared-key-row {
+      justify-content: flex-start;
+      margin-bottom: 0;
+    }
+
+    .blob {
+      width: 64px;
+      height: 64px;
+      border-radius: 14px;
+      border: 2px solid rgba(26, 34, 51, 0.14);
+      flex-shrink: 0;
+    }
+
+    .blob.lg {
+      width: 88px;
+      height: 88px;
+      border-radius: 18px;
+    }
+
+    .blob-label {
+      font-size: 0.72rem;
+      color: var(--muted);
+      max-width: 100px;
+      text-align: center;
+      line-height: 1.2;
+    }
+
+    .mix-piece {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.25rem;
+    }
+
+    .symbol {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: var(--muted);
+      padding: 0 0.15rem;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      align-items: center;
+      margin-top: 0.25rem;
+    }
+
+    button.primary {
+      font-family: inherit;
+      font-weight: 700;
+      font-size: 0.88rem;
+      padding: 0.55rem 1rem;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      background: linear-gradient(180deg, #dbe8a8 0%, #a4b86a 100%);
+      color: #263015;
+      box-shadow: 0 2px 12px rgba(93, 110, 47, 0.22);
+    }
+
+    button.primary:disabled {
+      opacity: 0.38;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    button.secondary {
+      font-family: inherit;
+      font-weight: 600;
+      font-size: 0.85rem;
+      padding: 0.5rem 0.85rem;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      cursor: pointer;
+      background: var(--surface2);
+      color: var(--text);
+    }
+
+    button.secondary:hover {
+      border-color: rgba(26, 34, 51, 0.22);
+      background: #e8ecf5;
+    }
+
+    button.secondary:disabled {
+      opacity: 0.38;
+      cursor: not-allowed;
+    }
+
+    .nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.75rem;
+      margin-top: 0;
+      flex-wrap: wrap;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 0.85rem 1rem;
+      box-shadow: var(--shadow);
+    }
+
+    .nav-center {
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 1.25rem;
+      color: var(--muted);
+      font-size: 0.78rem;
+    }
+
+    [hidden] {
+      display: none !important;
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header>
+      <h1>Color keys</h1>
+      <p>Use <strong>Next</strong> and <strong>Back</strong>. Only the highlighted pane accepts input.</p>
+    </header>
+
+    <div class="workspace">
+      <section class="pane pane-public" id="pane-public" aria-labelledby="public-pane-heading">
+        <h4 class="pane-title" id="public-pane-heading">Public</h4>
+        <section class="public-strip" aria-label="Public board">
+          <h2>Board — everyone sees this</h2>
+          <div class="strip-grid">
+            <div class="strip-item">
+              <span>Agreed public color</span>
+              <div class="slot" id="slot-public"><span class="placeholder">Not yet</span></div>
+            </div>
+            <div class="strip-item">
+              <span>Posted by Alice</span>
+              <div class="slot" id="slot-post-a"><span class="placeholder">Waiting</span></div>
+            </div>
+            <div class="strip-item">
+              <span>Posted by Bob</span>
+              <div class="slot" id="slot-post-b"><span class="placeholder">Waiting</span></div>
+            </div>
+          </div>
+        </section>
+        <div class="pane-body" id="public-pane-body"></div>
+      </section>
+
+      <div class="split-row">
+        <section class="pane pane-alice" id="pane-alice" aria-labelledby="alice-pane-heading">
+          <h4 class="pane-title" id="alice-pane-heading">Alice</h4>
+          <div class="pane-body" id="alice-pane-body"></div>
+        </section>
+        <section class="pane pane-bob" id="pane-bob" aria-labelledby="bob-pane-heading">
+          <h4 class="pane-title" id="bob-pane-heading">Bob</h4>
+          <div class="pane-body" id="bob-pane-body"></div>
+        </section>
+      </div>
+    </div>
+
+    <nav class="nav">
+      <button type="button" class="secondary" id="btn-back">Back</button>
+      <span class="nav-center" id="step-counter"></span>
+      <button type="button" class="secondary" id="btn-next">Next</button>
+    </nav>
+
+    <footer>Simplified color &ldquo;mix&rdquo; so both sides land on the same final color.</footer>
+  </div>
+
+  <script>
+    function clamp(v, lo, hi) {
+      return Math.min(hi, Math.max(lo, v));
+    }
+
+    function rgbToHex(r, g, b) {
+      const h = (n) => n.toString(16).padStart(2, "0");
+      return `#${h(r)}${h(g)}${h(b)}`.toUpperCase();
+    }
+
+    function hexToRgb(hex) {
+      const h = hex.replace("#", "");
+      const v = parseInt(h.length === 3 ? h.split("").map((c) => c + c).join("") : h, 16);
+      return { r: (v >> 16) & 255, g: (v >> 8) & 255, b: v & 255 };
+    }
+
+    function mixXor(a, b) {
+      return {
+        r: a.r ^ b.r,
+        g: a.g ^ b.g,
+        b: a.b ^ b.b,
+      };
+    }
+
+    function hsvToRgb(h, s, v) {
+      const i = Math.floor(h * 6);
+      const f = h * 6 - i;
+      const p = v * (1 - s);
+      const q = v * (1 - f * s);
+      const t = v * (1 - (1 - f) * s);
+      let r = 0,
+        g = 0,
+        b = 0;
+      switch (i % 6) {
+        case 0:
+          r = v; g = t; b = p; break;
+        case 1:
+          r = q; g = v; b = p; break;
+        case 2:
+          r = p; g = v; b = t; break;
+        case 3:
+          r = p; g = q; b = v; break;
+        case 4:
+          r = t; g = p; b = v; break;
+        default:
+          r = v; g = p; b = q; break;
+      }
+      return {
+        r: Math.round(r * 255),
+        g: Math.round(g * 255),
+        b: Math.round(b * 255),
+      };
+    }
+
+    function rgbToHsv(r, g, b) {
+      r /= 255;
+      g /= 255;
+      b /= 255;
+      const max = Math.max(r, g, b);
+      const min = Math.min(r, g, b);
+      const d = max - min;
+      let h = 0;
+      if (d !== 0) {
+        if (max === r) h = ((g - b) / d + (g < b ? 6 : 0)) / 6;
+        else if (max === g) h = ((b - r) / d + 2) / 6;
+        else h = ((r - g) / d + 4) / 6;
+      }
+      const s = max === 0 ? 0 : d / max;
+      const v = max;
+      return { h, s, v };
+    }
+
+    class ColorEditor {
+      constructor(mount, initial, onChange) {
+        this.onChange = onChange;
+        this.rgb = { ...initial };
+
+        mount.innerHTML = "";
+        const row = document.createElement("div");
+        row.className = "wheel-row";
+
+        this.wheel = document.createElement("div");
+        this.wheel.className = "wheel-host";
+        this.wheel.setAttribute("role", "img");
+        this.wheel.setAttribute("aria-label", "Hue and saturation wheel");
+        this.knob = document.createElement("div");
+        this.knob.className = "wheel-knob";
+        this.wheel.appendChild(this.knob);
+
+        const stack = document.createElement("div");
+        stack.className = "controls-stack";
+
+        this.native = document.createElement("input");
+        this.native.type = "color";
+
+        const sliders = ["r", "g", "b"].map((ch) => {
+          const wrap = document.createElement("div");
+          wrap.className = "slider-row";
+          const lab = document.createElement("span");
+          lab.textContent = ch.toUpperCase();
+          const input = document.createElement("input");
+          input.type = "range";
+          input.min = "0";
+          input.max = "255";
+          const val = document.createElement("span");
+          val.textContent = "0";
+          wrap.appendChild(lab);
+          wrap.appendChild(input);
+          wrap.appendChild(val);
+          input.addEventListener("input", () => {
+            this.rgb[ch] = +input.value;
+            val.textContent = input.value;
+            this.syncFromRgb(false);
+          });
+          this[`slider_${ch}`] = input;
+          this[`val_${ch}`] = val;
+          return wrap;
+        });
+
+        this.hexEl = document.createElement("div");
+        this.hexEl.className = "hex-row";
+
+        stack.appendChild(this.native);
+        sliders.forEach((el) => stack.appendChild(el));
+
+        row.appendChild(this.wheel);
+        row.appendChild(stack);
+        mount.appendChild(row);
+        mount.appendChild(this.hexEl);
+
+        const stops = [];
+        for (let i = 0; i <= 360; i += 5) {
+          stops.push(`hsl(${i} 100% 50%) ${i}deg`);
+        }
+        this.wheel.style.background = `conic-gradient(from 0deg at 50% 50%, ${stops.join(",")})`;
+
+        this.native.addEventListener("input", () => {
+          this.rgb = hexToRgb(this.native.value);
+          this.syncFromRgb(false);
+        });
+
+        this.wheel.addEventListener("pointerdown", (e) => {
+          this.wheel.setPointerCapture(e.pointerId);
+          this.pickWheel(e);
+        });
+        this.wheel.addEventListener("pointermove", (e) => {
+          if (!this.wheel.hasPointerCapture(e.pointerId)) return;
+          this.pickWheel(e);
+        });
+        const release = (e) => {
+          if (this.wheel.hasPointerCapture(e.pointerId)) {
+            this.wheel.releasePointerCapture(e.pointerId);
+          }
+        };
+        this.wheel.addEventListener("pointerup", release);
+        this.wheel.addEventListener("pointercancel", release);
+
+        this.syncFromRgb(true);
+      }
+
+      pickWheel(ev) {
+        const rect = this.wheel.getBoundingClientRect();
+        const cx = rect.left + rect.width / 2;
+        const cy = rect.top + rect.height / 2;
+        const dx = ev.clientX - cx;
+        const dy = ev.clientY - cy;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        const rMax = rect.width / 2 - 4;
+        if (dist > rMax || dist < 4) return;
+
+        const hueDeg = (Math.atan2(dx, -dy) * 180) / Math.PI;
+        const hue = ((hueDeg % 360) + 360) % 360;
+        const sat = clamp(dist / (rMax * 0.92), 0, 1);
+
+        const { v } = rgbToHsv(this.rgb.r, this.rgb.g, this.rgb.b);
+        this.rgb = hsvToRgb(hue / 360, sat, Math.max(0.15, v));
+        this.syncFromRgb(false);
+      }
+
+      syncKnob() {
+        const { h, s } = rgbToHsv(this.rgb.r, this.rgb.g, this.rgb.b);
+        const rect = this.wheel.getBoundingClientRect();
+        if (rect.width < 8 || rect.height < 8) return;
+        const rMax = rect.width / 2 - 4;
+        const hueDeg = h * 360;
+        const angleRad = (hueDeg * Math.PI) / 180;
+        const rad = Math.max(0, s) * rMax * 0.92;
+        const cx = rect.width / 2;
+        const cy = rect.height / 2;
+        const x = cx + Math.sin(angleRad) * rad;
+        const y = cy - Math.cos(angleRad) * rad;
+        this.knob.style.left = `${x}px`;
+        this.knob.style.top = `${y}px`;
+        this.knob.style.background = rgbToHex(this.rgb.r, this.rgb.g, this.rgb.b);
+      }
+
+      syncFromRgb(skipKnob) {
+        const { r, g, b } = this.rgb;
+        const hex = rgbToHex(r, g, b);
+        this.native.value = hex.toLowerCase();
+        ["r", "g", "b"].forEach((ch) => {
+          this[`slider_${ch}`].value = String(this.rgb[ch]);
+          this[`val_${ch}`].textContent = String(this.rgb[ch]);
+        });
+        this.hexEl.textContent = hex;
+        if (!skipKnob) {
+          requestAnimationFrame(() => this.syncKnob());
+        }
+        this.onChange({ ...this.rgb });
+      }
+
+      setRgb(rgb) {
+        this.rgb = { ...rgb };
+        this.syncFromRgb(false);
+      }
+    }
+
+    const STEPS = [
+      { kind: "pick-a" },
+      { kind: "pick-b" },
+      { kind: "pick-public" },
+      { kind: "mix-a" },
+      { kind: "mix-b" },
+      { kind: "final-a" },
+      { kind: "final-b" },
+      { kind: "shared-key" },
+    ];
+
+    let publicRgb = { r: 245, g: 220, b: 65 };
+    let secretA = { r: 190, g: 60, b: 80 };
+    let secretB = { r: 55, g: 110, b: 200 };
+
+    let stepIndex = 0;
+    /** @type {Record<number, boolean>} */
+    const actionDone = {};
+
+    /** @type {ColorEditor | null} */
+    let activeEditor = null;
+
+    function resetActionsFrom(firstStep) {
+      for (let s = firstStep; s < STEPS.length; s++) {
+        delete actionDone[s];
+      }
+    }
+
+    function mixOutA() {
+      return mixXor(publicRgb, secretA);
+    }
+
+    function mixOutB() {
+      return mixXor(publicRgb, secretB);
+    }
+
+    function finalA() {
+      return mixXor(mixOutB(), secretA);
+    }
+
+    function finalB() {
+      return mixXor(mixOutA(), secretB);
+    }
+
+    function fillSlot(el, rgb, hexText) {
+      el.classList.add("filled");
+      el.innerHTML = `<span class="hex">${hexText}</span>`;
+      el.style.background = rgbToHex(rgb.r, rgb.g, rgb.b);
+    }
+
+    function emptySlot(el, label) {
+      el.classList.remove("filled");
+      el.style.background = "";
+      el.innerHTML = `<span class="placeholder">${label}</span>`;
+    }
+
+    function updatePublicStrip() {
+      const pubEl = document.getElementById("slot-public");
+      const aEl = document.getElementById("slot-post-a");
+      const bEl = document.getElementById("slot-post-b");
+
+      if (stepIndex >= 2) {
+        fillSlot(pubEl, publicRgb, rgbToHex(publicRgb.r, publicRgb.g, publicRgb.b));
+      } else {
+        emptySlot(pubEl, "Not yet");
+      }
+
+      if (actionDone[3]) {
+        const m = mixOutA();
+        fillSlot(aEl, m, rgbToHex(m.r, m.g, m.b));
+      } else {
+        emptySlot(aEl, "Waiting");
+      }
+
+      if (actionDone[4]) {
+        const m = mixOutB();
+        fillSlot(bEl, m, rgbToHex(m.r, m.g, m.b));
+      } else {
+        emptySlot(bEl, "Waiting");
+      }
+    }
+
+    function stepNeedsAction(i) {
+      return i >= 3 && i <= 6;
+    }
+
+    function canGoNext() {
+      if (stepIndex === STEPS.length - 1) return true;
+      if (stepNeedsAction(stepIndex)) {
+        return !!actionDone[stepIndex];
+      }
+      return true;
+    }
+
+    function paintBlob(el, rgb) {
+      el.style.background = rgbToHex(rgb.r, rgb.g, rgb.b);
+    }
+
+    function mixPiece(rgb, label, lg, sm) {
+      const wrap = document.createElement("div");
+      wrap.className = "mix-piece";
+      const b = document.createElement("div");
+      if (lg) b.className = "blob lg";
+      else if (sm) b.className = "blob sm";
+      else b.className = "blob";
+      paintBlob(b, rgb);
+      const lab = document.createElement("div");
+      lab.className = "blob-label";
+      lab.textContent = label;
+      wrap.appendChild(b);
+      wrap.appendChild(lab);
+      return wrap;
+    }
+
+    function focusPaneForStep(i) {
+      if (i === STEPS.length - 1) return "both";
+      if (i === 2) return "public";
+      if ([0, 3, 5].includes(i)) return "alice";
+      return "bob";
+    }
+
+    function applyPaneFocus(focus) {
+      document.getElementById("pane-public").classList.toggle("is-active", focus === "public");
+      const aliceEl = document.getElementById("pane-alice");
+      const bobEl = document.getElementById("pane-bob");
+      aliceEl.classList.toggle("is-active", focus === "alice" || focus === "both");
+      bobEl.classList.toggle("is-active", focus === "bob" || focus === "both");
+    }
+
+    function renderPublicPane(def, focus) {
+      const body = document.getElementById("public-pane-body");
+      body.innerHTML = "";
+      if (focus === "public" && def.kind === "pick-public") {
+        const lab = document.createElement("div");
+        lab.className = "editor-label";
+        lab.textContent = "Pick the public color (everyone will know it)";
+        const mount = document.createElement("div");
+        mount.className = "color-editor";
+        body.appendChild(lab);
+        body.appendChild(mount);
+        activeEditor = new ColorEditor(mount, publicRgb, (rgb) => {
+          publicRgb = rgb;
+          updatePublicStrip();
+        });
+        requestAnimationFrame(() => activeEditor?.syncKnob());
+        return;
+      }
+      if (def.kind === "shared-key") {
+        const sharedHint = document.createElement("p");
+        sharedHint.className = "pane-hint";
+        sharedHint.textContent =
+          "Compare Alice’s and Bob’s panes below — both show the same shared key. Neither secret was posted.";
+        body.appendChild(sharedHint);
+        return;
+      }
+      const hint = document.createElement("p");
+      hint.className = "pane-hint";
+      if (stepIndex < 2) {
+        hint.textContent =
+          "You’ll agree on the public color on step 3 — this pane will light up then.";
+      } else {
+        hint.textContent =
+          "The agreed color is on the board. After each Mix step, that mixed color appears on the board automatically — no separate send.";
+      }
+      body.appendChild(hint);
+    }
+
+    function renderAliceSummary(container) {
+      const hint = document.createElement("p");
+      hint.className = "pane-hint";
+      if (stepIndex === 0) {
+        hint.textContent = "Alice works here when this pane is highlighted.";
+        container.appendChild(hint);
+        return;
+      }
+      hint.textContent = "Alice’s pane is resting — snapshot:";
+      container.appendChild(hint);
+      const row = document.createElement("div");
+      row.className = "summary-row";
+      row.appendChild(mixPiece(secretA, "Secret", false, true));
+      if (actionDone[3]) {
+        row.appendChild(mixPiece(mixOutA(), "Mixed", false, true));
+      }
+      if (actionDone[5]) {
+        row.appendChild(mixPiece(finalA(), "Final", false, true));
+      }
+      container.appendChild(row);
+    }
+
+    function renderBobSummary(container) {
+      const hint = document.createElement("p");
+      hint.className = "pane-hint";
+      if (stepIndex < 1) {
+        hint.textContent = "Bob waits until after Alice picks her secret.";
+        container.appendChild(hint);
+        return;
+      }
+      hint.textContent = "Bob’s pane is resting — snapshot:";
+      container.appendChild(hint);
+      const row = document.createElement("div");
+      row.className = "summary-row";
+      row.appendChild(mixPiece(secretB, "Secret", false, true));
+      if (actionDone[4]) {
+        row.appendChild(mixPiece(mixOutB(), "Mixed", false, true));
+      }
+      if (actionDone[6]) {
+        row.appendChild(mixPiece(finalB(), "Final", false, true));
+      }
+      container.appendChild(row);
+    }
+
+    function renderAliceInteractive(container, def) {
+      if (def.kind === "pick-a") {
+        const lab = document.createElement("div");
+        lab.className = "editor-label";
+        lab.textContent = "Secret color";
+        const mount = document.createElement("div");
+        mount.className = "color-editor";
+        container.appendChild(lab);
+        container.appendChild(mount);
+        activeEditor = new ColorEditor(mount, secretA, (rgb) => {
+          secretA = rgb;
+          updatePublicStrip();
+        });
+        requestAnimationFrame(() => activeEditor?.syncKnob());
+        return;
+      }
+
+      const row = document.createElement("div");
+      row.className = "mix-layout";
+
+      if (def.kind === "mix-a") {
+        row.appendChild(mixPiece(publicRgb, "Public color", false));
+        row.appendChild(createSymbol("+"));
+        row.appendChild(mixPiece(secretA, "Alice’s secret", false));
+        row.appendChild(createSymbol("→"));
+        const outWrap = mixPiece(mixOutA(), "Mixed color", true);
+        if (!actionDone[3]) {
+          outWrap.style.opacity = "0.25";
+          outWrap.querySelector(".blob").style.visibility = "hidden";
+          outWrap.querySelector(".blob-label").textContent = "?";
+        }
+        row.appendChild(outWrap);
+        container.appendChild(row);
+        container.appendChild(buildMixButton(3, "Mix"));
+        return;
+      }
+
+      if (def.kind === "final-a") {
+        row.appendChild(mixPiece(mixOutB(), "From Bob (public)", false));
+        row.appendChild(createSymbol("+"));
+        row.appendChild(mixPiece(secretA, "Alice’s secret", false));
+        row.appendChild(createSymbol("→"));
+        const outWrap = mixPiece(finalA(), "Final blend", true);
+        if (!actionDone[5]) {
+          outWrap.style.opacity = "0.25";
+          outWrap.querySelector(".blob").style.visibility = "hidden";
+          outWrap.querySelector(".blob-label").textContent = "?";
+        }
+        row.appendChild(outWrap);
+        container.appendChild(row);
+        container.appendChild(buildMixButton(5, "Mix"));
+      }
+    }
+
+    function renderBobInteractive(container, def) {
+      if (def.kind === "pick-b") {
+        const lab = document.createElement("div");
+        lab.className = "editor-label";
+        lab.textContent = "Secret color";
+        const mount = document.createElement("div");
+        mount.className = "color-editor";
+        container.appendChild(lab);
+        container.appendChild(mount);
+        activeEditor = new ColorEditor(mount, secretB, (rgb) => {
+          secretB = rgb;
+          updatePublicStrip();
+        });
+        requestAnimationFrame(() => activeEditor?.syncKnob());
+        return;
+      }
+
+      const row = document.createElement("div");
+      row.className = "mix-layout";
+
+      if (def.kind === "mix-b") {
+        row.appendChild(mixPiece(publicRgb, "Public color", false));
+        row.appendChild(createSymbol("+"));
+        row.appendChild(mixPiece(secretB, "Bob’s secret", false));
+        row.appendChild(createSymbol("→"));
+        const outWrap = mixPiece(mixOutB(), "Mixed color", true);
+        if (!actionDone[4]) {
+          outWrap.style.opacity = "0.25";
+          outWrap.querySelector(".blob").style.visibility = "hidden";
+          outWrap.querySelector(".blob-label").textContent = "?";
+        }
+        row.appendChild(outWrap);
+        container.appendChild(row);
+        container.appendChild(buildMixButton(4, "Mix"));
+        return;
+      }
+
+      if (def.kind === "final-b") {
+        row.appendChild(mixPiece(mixOutA(), "From Alice (public)", false));
+        row.appendChild(createSymbol("+"));
+        row.appendChild(mixPiece(secretB, "Bob’s secret", false));
+        row.appendChild(createSymbol("→"));
+        const outWrap = mixPiece(finalB(), "Final blend", true);
+        if (!actionDone[6]) {
+          outWrap.style.opacity = "0.25";
+          outWrap.querySelector(".blob").style.visibility = "hidden";
+          outWrap.querySelector(".blob-label").textContent = "?";
+        }
+        row.appendChild(outWrap);
+        container.appendChild(row);
+        container.appendChild(buildMixButton(6, "Mix"));
+      }
+    }
+
+    function sharedKeysMatch() {
+      const fa = finalA();
+      const fb = finalB();
+      return fa.r === fb.r && fa.g === fb.g && fa.b === fb.b;
+    }
+
+    function renderAliceSharedKey(container) {
+      const fa = finalA();
+      const lab = document.createElement("div");
+      lab.className = "editor-label";
+      lab.textContent = "Alice’s shared key";
+      const row = document.createElement("div");
+      row.className = "mix-layout shared-key-row";
+      row.appendChild(
+        mixPiece(fa, sharedKeysMatch() ? "Same as Bob" : "Compare with Bob", true)
+      );
+      const hex = document.createElement("div");
+      hex.className = "hex-row";
+      hex.style.marginTop = "0.35rem";
+      hex.textContent = rgbToHex(fa.r, fa.g, fa.b);
+      container.appendChild(lab);
+      container.appendChild(row);
+      container.appendChild(hex);
+    }
+
+    function renderBobSharedKey(container) {
+      const fb = finalB();
+      const lab = document.createElement("div");
+      lab.className = "editor-label";
+      lab.textContent = "Bob’s shared key";
+      const row = document.createElement("div");
+      row.className = "mix-layout shared-key-row";
+      row.appendChild(
+        mixPiece(fb, sharedKeysMatch() ? "Same as Alice" : "Compare with Alice", true)
+      );
+      const hex = document.createElement("div");
+      hex.className = "hex-row";
+      hex.style.marginTop = "0.35rem";
+      hex.textContent = rgbToHex(fb.r, fb.g, fb.b);
+      container.appendChild(lab);
+      container.appendChild(row);
+      container.appendChild(hex);
+    }
+
+    function renderAlicePane(def, focus) {
+      const el = document.getElementById("alice-pane-body");
+      el.innerHTML = "";
+      if (focus === "both") {
+        renderAliceSharedKey(el);
+        return;
+      }
+      if (focus === "alice") {
+        renderAliceInteractive(el, def);
+        return;
+      }
+      renderAliceSummary(el);
+    }
+
+    function renderBobPane(def, focus) {
+      const el = document.getElementById("bob-pane-body");
+      el.innerHTML = "";
+      if (focus === "both") {
+        renderBobSharedKey(el);
+        return;
+      }
+      if (focus === "bob") {
+        renderBobInteractive(el, def);
+        return;
+      }
+      renderBobSummary(el);
+    }
+
+    function renderAllPanes(def, focus) {
+      activeEditor = null;
+      renderPublicPane(def, focus);
+      renderAlicePane(def, focus);
+      renderBobPane(def, focus);
+    }
+
+    function createSymbol(t) {
+      const s = document.createElement("span");
+      s.className = "symbol";
+      s.textContent = t;
+      return s;
+    }
+
+    function buildMixButton(step, label) {
+      const wrap = document.createElement("div");
+      wrap.className = "actions";
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "primary";
+      btn.textContent = label;
+      if (actionDone[step]) {
+        btn.disabled = true;
+        btn.textContent = `${label} ✓`;
+      }
+      btn.addEventListener("click", () => {
+        actionDone[step] = true;
+        updatePublicStrip();
+        render();
+      });
+      wrap.appendChild(btn);
+      return wrap;
+    }
+
+    function render() {
+      const def = STEPS[stepIndex];
+      const focus = focusPaneForStep(stepIndex);
+
+      document.getElementById("step-counter").textContent = `${stepIndex + 1} / ${STEPS.length}`;
+
+      applyPaneFocus(focus);
+      renderAllPanes(def, focus);
+      updatePublicStrip();
+
+      document.getElementById("btn-back").disabled = stepIndex === 0;
+      document.getElementById("btn-next").disabled = !canGoNext();
+
+      const nextBtn = document.getElementById("btn-next");
+      if (stepIndex === STEPS.length - 1) {
+        nextBtn.textContent = "Start over";
+        nextBtn.disabled = false;
+      } else {
+        nextBtn.textContent = "Next";
+      }
+    }
+
+    document.getElementById("btn-back").addEventListener("click", () => {
+      if (stepIndex <= 0) return;
+      stepIndex -= 1;
+      resetActionsFrom(stepIndex + 1);
+      render();
+    });
+
+    document.getElementById("btn-next").addEventListener("click", () => {
+      if (stepIndex === STEPS.length - 1) {
+        stepIndex = 0;
+        resetActionsFrom(0);
+        render();
+        return;
+      }
+      if (!canGoNext()) return;
+      stepIndex += 1;
+      render();
+    });
+
+    window.addEventListener("resize", () => {
+      activeEditor?.syncKnob();
+    });
+
+    render();
+  </script>
+</body>
+</html>
